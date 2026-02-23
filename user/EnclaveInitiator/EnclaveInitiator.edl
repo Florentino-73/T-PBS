@@ -1,0 +1,39 @@
+enclave {
+    include "sgx_eid.h"
+    include "datatypes.h"
+    include "dh_session_protocol.h"
+    include "../Include/dcap_dh_def.h"
+    
+    from "sgx_tprotected_fs.edl" import *;
+    
+    trusted{
+            public uint32_t ecall_create_session([out, size=4]uint32_t *session_id);
+            public uint32_t ecall_close_session();
+
+            public uint32_t ecall_get_data_id([out, size=4]uint32_t *data_id);
+            public uint32_t ecall_send_user_data([in, size=inp_buff_len]char *inp_buff, size_t inp_buff_len, [out, size=out_buff_len]secure_message_t *out_buff, size_t out_buff_len);
+            
+            public uint32_t ecall_decrypt_key_encrypt_file([in, size=secure_msg_size]uint8_t *secure_resp, uint32_t secure_msg_size, [in, size=file_size]uint8_t *content, uint32_t file_size,  [out, size=out_size]secure_message_t *encrypted_out_buff, uint32_t out_size, [out, size=4]uint32_t *data_id);
+
+        //     public uint32_t ecall_open_file(uint32_t id, [in, size=content_len]uint8_t *content, uint32_t content_len);
+
+    };
+
+    untrusted{
+	    uint32_t session_request_ocall([out] sgx_dh_dcap_msg1_t *dh_msg1,[out] uint32_t *session_id, sgx_enclave_id_t wasm_vm_enclave_id);
+            uint32_t exchange_report_ocall([in] sgx_dh_dcap_msg2_t *dh_msg2, [out] sgx_dh_dcap_msg3_t *dh_msg3, uint32_t session_id, sgx_enclave_id_t wasm_vm_enclave_id);
+
+            uint32_t send_request_ocall(uint32_t session_id, [in, size = req_message_size] secure_message_t* req_message, size_t req_message_size, size_t max_payload_size, [out, size=resp_message_size] secure_message_t* resp_message, size_t resp_message_size, sgx_enclave_id_t wasm_vm_enclave_id);
+            
+            uint32_t end_session_ocall(uint32_t session_id, sgx_enclave_id_t wasm_vm_enclave_id);
+            uint32_t send_user_request_ocall(uint32_t session_id, [out, size=resp_message_size] secure_message_t* resp_message, size_t resp_message_size, sgx_enclave_id_t wasm_vm_enclave_id);
+
+            // Dummy implementations for DCAP functions - in real scenario these would need proper implementation
+            uint32_t ecdsa_quote_verification_ocall([in, size = 5000] uint8_t* quote_buffer, uint32_t quote_size);
+            uint32_t ecdsa_quote_generation_ocall([out]uint32_t* quote_size, [in] sgx_report_t* app_report, [out, size = 5000] uint8_t* quote);
+            uint32_t ecdsa_get_qe_target_info_ocall([out] sgx_target_info_t* qe_target_info);
+
+            void ocall_printf([in, string] const char *str);
+    };
+
+};

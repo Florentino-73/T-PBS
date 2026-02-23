@@ -1,0 +1,32 @@
+enclave{
+    include "sgx_eid.h"
+    include "datatypes.h"
+    include "dh_session_protocol.h"
+    include "dcap_dh_def.h"
+    from "sgx_tprotected_fs.edl" import *;
+
+    trusted{
+        public uint32_t enclave_create_session_with_server([out]uint32_t *session_id);
+        public void ecall_print_mrsigner();
+        public uint32_t ecall_executor_close_session();
+
+        public uint32_t ecall_add_aek([in, size=resp_size]secure_message_t *resp_data, uint32_t resp_size); 
+
+        public uint32_t ecall_batch_add_aek([in, size=resp_size]secure_message_t *resp_data, uint32_t resp_size);
+        public uint32_t ecall_run_gwas(uint32_t id, [in, size=content_len]uint8_t *content, uint32_t content_len);
+    };
+    untrusted{
+        uint32_t session_request_ocall([out] sgx_dh_dcap_msg1_t *dh_msg1,[out] uint32_t *session_id);
+        uint32_t exchange_report_ocall([in] sgx_dh_dcap_msg2_t *dh_msg2, [out] sgx_dh_dcap_msg3_t *dh_msg3, uint32_t session_id);
+
+        uint32_t ecdsa_quote_verification_ocall([in, size = quote_size] uint8_t* quote_buffer, uint32_t quote_size);
+        uint32_t ecdsa_quote_generation_ocall([out]uint32_t* quote_size, [in] sgx_report_t* app_report, [out, size = 5000] uint8_t* quote_buffer);
+        uint32_t ecdsa_get_qe_target_info_ocall([out] sgx_target_info_t* qe_target_info);
+        
+        // uint32_t send_proposal_ocall(uint32_t session_id, [in, size = req_message_size] secure_message_t* req_message, size_t req_message_size, [out, size=resp_message_size] secure_message_t* resp_message, size_t resp_message_size);
+
+        void ocall_printf([in, string] const char *str);
+
+        uint32_t end_session_ocall(uint32_t session_id);
+    };
+};

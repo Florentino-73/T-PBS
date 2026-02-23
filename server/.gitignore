@@ -1,0 +1,4 @@
+test_data/gwas_encrypted/*
+*.log
+server_res/*
+.vscode

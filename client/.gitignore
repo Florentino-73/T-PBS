@@ -1,0 +1,5 @@
+test_data/gwas_encrypted/*
+raw_res
+.history
+.vscode
+*.log

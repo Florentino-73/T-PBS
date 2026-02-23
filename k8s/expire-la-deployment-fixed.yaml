@@ -1,0 +1,221 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: expire-la-server
+  namespace: default
+spec:
+  selector:
+    app: expire-la-server
+  ports:
+  - name: tcp-8888
+    port: 8888
+    targetPort: 8888
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expire-la-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expire-la-server
+  template:
+    metadata:
+      labels:
+        app: expire-la-server
+    spec:
+      nodeSelector:
+        "intel.feature.node.kubernetes.io/sgx": "true"
+      containers:
+      - name: expire-la-server
+        image: expire-la-server:test
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8888
+        resources:
+          limits:
+            sgx.intel.com/epc: 64Mi
+          requests:
+            sgx.intel.com/epc: 64Mi
+        securityContext:
+          readOnlyRootFilesystem: false
+        command:
+        - sh
+        - -c
+        - |
+          echo "Starting ExpireLA Server..."
+          cd /app/bin
+          ./appserver --pageSize 1024 --numThreads 2 --managerCap 100 --logDir /tmp/log --logLevel 1
+        volumeMounts:
+        - name: sgx-aesmd-socket
+          mountPath: /var/run/aesmd
+        - name: sgx-enclave
+          mountPath: /dev/sgx_enclave
+        - name: sgx-provision
+          mountPath: /dev/sgx_provision
+        - name: log-volume
+          mountPath: /tmp/log
+        - name: test-data
+          mountPath: /app/test_data
+      volumes:
+      - name: sgx-aesmd-socket
+        hostPath:
+          path: /var/run/aesmd
+      - name: sgx-enclave
+        hostPath:
+          path: /dev/sgx_enclave
+      - name: sgx-provision
+        hostPath:
+          path: /dev/sgx_provision
+      - name: log-volume
+        emptyDir: {}
+      - name: test-data
+        emptyDir: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expire-la-client
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: expire-la-client
+  template:
+    metadata:
+      labels:
+        app: expire-la-client
+    spec:
+      nodeSelector:
+        "intel.feature.node.kubernetes.io/sgx": "true"
+      containers:
+      - name: expire-la-client
+        image: expire-la-client:test
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            sgx.intel.com/epc: 64Mi
+          requests:
+            sgx.intel.com/epc: 64Mi
+        securityContext:
+          readOnlyRootFilesystem: false
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for server to be ready..."
+          sleep 10
+          echo "Starting ExpireLA Client..."
+          cd /app/bin
+          ./apprequester --maxId 20 --reqNum 5 --pageSize 1024 --logDir /tmp/log --logLevel 1
+        volumeMounts:
+        - name: sgx-aesmd-socket
+          mountPath: /var/run/aesmd
+        - name: sgx-enclave
+          mountPath: /dev/sgx_enclave
+        - name: sgx-provision
+          mountPath: /dev/sgx_provision
+        - name: log-volume
+          mountPath: /tmp/log
+        - name: test-data
+          mountPath: /app/test_data
+        env:
+        - name: SERVER_HOST
+          value: "expire-la-server"
+        - name: SERVER_PORT
+          value: "8888"
+        - name: EXPIRE_LA_SERVER_ADDR
+          value: "expire-la-server"
+        - name: EXPIRE_LA_SERVER_PORT
+          value: "8888"
+      volumes:
+      - name: sgx-aesmd-socket
+        hostPath:
+          path: /var/run/aesmd
+      - name: sgx-enclave
+        hostPath:
+          path: /dev/sgx_enclave
+      - name: sgx-provision
+        hostPath:
+          path: /dev/sgx_provision
+      - name: log-volume
+        emptyDir: {}
+      - name: test-data
+        emptyDir: {}
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: expire-la-user
+  namespace: default
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      nodeSelector:
+        "intel.feature.node.kubernetes.io/sgx": "true"
+      restartPolicy: Never
+      containers:
+      - name: expire-la-user
+        image: expire-la-user:test
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            sgx.intel.com/epc: 64Mi
+          requests:
+            sgx.intel.com/epc: 64Mi
+        securityContext:
+          readOnlyRootFilesystem: false
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for manual setup..."
+          sleep infinity
+          # echo "Waiting for server to be ready..."
+          # sleep 15
+          # echo "Starting ExpireLA User data insertion..."
+          # cd /app/bin
+          # ./appinsertor -n 10 --logDir /tmp/log/user/ --logLevel 1
+        volumeMounts:
+        - name: sgx-aesmd-socket
+          mountPath: /var/run/aesmd
+        - name: sgx-enclave
+          mountPath: /dev/sgx_enclave
+        - name: sgx-provision
+          mountPath: /dev/sgx_provision
+        - name: log-volume
+          mountPath: /tmp/log
+        - name: test-data
+          mountPath: /app/test_data
+        env:
+        - name: SERVER_HOST
+          value: "expire-la-server"
+        - name: SERVER_PORT
+          value: "8888"
+        - name: EXPIRE_LA_SERVER_ADDR
+          value: "expire-la-server"
+        - name: EXPIRE_LA_SERVER_PORT
+          value: "8888"
+      volumes:
+      - name: sgx-aesmd-socket
+        hostPath:
+          path: /var/run/aesmd
+      - name: sgx-enclave
+        hostPath:
+          path: /dev/sgx_enclave
+      - name: sgx-provision
+        hostPath:
+          path: /dev/sgx_provision
+      - name: log-volume
+        emptyDir: {}
+      - name: test-data
+        emptyDir: {}

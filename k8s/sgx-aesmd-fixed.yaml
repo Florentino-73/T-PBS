@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: intel-sgx-aesmd
+  namespace: default
+  labels:
+    app: intel-sgx-aesmd
+spec:
+  selector:
+    matchLabels:
+      app: intel-sgx-aesmd
+  template:
+    metadata:
+      labels:
+        app: intel-sgx-aesmd
+      annotations:
+        sgx.intel.com/quote-provider: aesmd
+    spec:
+      hostPID: true
+      hostIPC: true
+      containers:
+      - name: aesmd
+        image: intel/sgx-aesmd-demo:devel
+        imagePullPolicy: IfNotPresent
+        
+        # Add command to ensure AESMD runs as a daemon
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            # Create necessary directories
+            mkdir -p /var/run/aesmd /tmp/aesmd
+            chmod 755 /var/run/aesmd /tmp/aesmd
+            
+            # Start the AESMD daemon, keep running in foreground
+            exec /opt/intel/sgx-aesm-service/aesm/aesm_service --no-daemon --no-syslog
+        
+        securityContext:
+          privileged: true
+          allowPrivilegeEscalation: true
+          readOnlyRootFilesystem: false
+          runAsUser: 0
+          capabilities:
+            add:
+              - SYS_ADMIN
+              - SYS_RESOURCE
+        
+        resources:
+          limits:
+            sgx.intel.com/epc: 2Mi
+          requests:
+            sgx.intel.com/epc: 2Mi
+        
+        volumeMounts:
+        # SGX device mount
+        - name: dev-sgx
+          mountPath: /dev
+          readOnly: false
+        
+        # AESMD socket directory
+        - name: aesmd-socket
+          mountPath: /var/run/aesmd
+          
+        # Temporary directory
+        - name: tmp-aesmd
+          mountPath: /tmp/aesmd
+        
+        # Configuration file mount
+        - name: aesmd-config
+          mountPath: /etc/aesmd.conf
+          subPath: aesmd.conf
+          readOnly: true
+        
+        - name: qpl-config
+          mountPath: /etc/sgx_default_qcnl.conf
+          subPath: sgx_default_qcnl.conf
+          readOnly: true
+        
+        # Health check
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "test -S /var/run/aesmd/aesm.socket"
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "test -S /var/run/aesmd/aesm.socket"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+      volumes:
+      # SGX device access
+      - name: dev-sgx
+        hostPath:
+          path: /dev
+          type: Directory
+      
+      # AESMD socket sharing
+      - name: aesmd-socket
+        hostPath:
+          path: /var/run/aesmd
+          type: DirectoryOrCreate
+      
+      # Temporary directory
+      - name: tmp-aesmd
+        emptyDir: {}
+      
+      # Configuration files
+      - name: aesmd-config
+        configMap:
+          name: sgx-attestation-conf
+          items:
+          - key: aesmd.conf
+            path: aesmd.conf
+      
+      - name: qpl-config
+        configMap:
+          name: sgx-attestation-conf
+          items:
+          - key: sgx_default_qcnl.conf
+            path: sgx_default_qcnl.conf
+      
+      nodeSelector:
+        intel.feature.node.kubernetes.io/sgx: "true"
+      
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute

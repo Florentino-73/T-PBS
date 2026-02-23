@@ -1,0 +1,57 @@
+# IDE & Editor
+.history
+.vscode/
+.idea/
+.VSCodeCounter
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+env/
+venv/
+
+# Build artifacts
+*.o
+*.so
+*.a
+*/bin/
+build/CMakeCache.txt
+build/CMakeFiles/
+
+# SGX generated files (edger8r output)
+*_t.c
+*_t.h
+*_u.c
+*_u.h
+
+# Logs
+*.log
+server/log/
+
+# Test data (encrypted outputs)
+client/test_data/gwas_encrypted/*
+user/test_data/gwas_encrypted/*
+server/test_data/gwas_encrypted/*
+
+# Experiment outputs
+experiment_results/
+*.png
+*.pdf
+
+# Misc
+archived/
+noGWAS*
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Sensitive files — DO NOT commit keys or secrets
+*.pem
+k8s/pccs-tls-secret.yaml
+
+# Build-generated config (contains local paths)
+**/config.status

@@ -1,0 +1,4 @@
+gwas
+gwas_encrypted/*
+# Keep only sample files in generated_gwas; generate full dataset with:
+#   python3 generate_test_data.py --count 5000 --output generated_gwas
