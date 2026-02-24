@@ -1,6 +1,6 @@
 # T-PBS: TEE-based Privacy Budget Scheduling
 
-> **Paper**: *T-PBS: TEE-based Privacy Budget Scheduling for Secure Data Analytics*
+> **Paper**: *Reconciling Efficiency and Trust: A Controllable Privacy-Preserving Framework for Data Markets* (under review)
 
 A privacy-preserving data query system built on Intel SGX, featuring EPC-aware scheduling algorithms for managing differential privacy budgets within Trusted Execution Environments (TEEs).
 
@@ -224,9 +224,9 @@ If you use this code in your research, please cite:
 
 ```bibtex
 @article{tpbs2025,
-  title={T-PBS: TEE-based Privacy Budget Scheduling for Secure Data Analytics},
-  author={[Author Names]},
-  journal={[Venue]},
+  title={Reconciling Efficiency and Trust: A Controllable Privacy-Preserving Framework for Data Markets},
+  author={[Authors (under review)]},
+  journal={[Under Review]},
   year={2025}
 }
 ```

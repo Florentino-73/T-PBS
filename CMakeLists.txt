@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(expire_la)
+project(t_pbs)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,7 +28,7 @@ add_library(config_lib
     common/config.cpp
 )
 
-add_executable(expire_la_server
+add_executable(t_pbs_server
     server/AppResponder/App.cpp
     server/AppResponder/CPServer.cpp
     server/AppResponder/CPTask.cpp
@@ -36,33 +36,33 @@ add_executable(expire_la_server
     server/util/fifo.cpp
 )
 
-add_executable(expire_la_user
+add_executable(t_pbs_user
     user/AppInitiator/App.cpp
     user/util/fifo.cpp
 )
 
-add_executable(expire_la_client
+add_executable(t_pbs_client
     client/AppInitiator/App.cpp
     client/util/fifo.cpp
 )
 
-target_link_libraries(expire_la_server 
+target_link_libraries(t_pbs_server 
     config_lib
-    # expire_la_dcap  # Not available until dcap is built
+    # t_pbs_dcap  # Not available until dcap is built
     ${GLOG_LIBRARIES}
     pthread
 )
 
-target_link_libraries(expire_la_user 
+target_link_libraries(t_pbs_user 
     config_lib
-    # expire_la_dcap  # Not available until dcap is built
+    # t_pbs_dcap  # Not available until dcap is built
     ${GLOG_LIBRARIES}
     pthread
 )
 
-target_link_libraries(expire_la_client 
+target_link_libraries(t_pbs_client 
     config_lib
-    # expire_la_dcap  # Not available until dcap is built
+    # t_pbs_dcap  # Not available until dcap is built
     ${GLOG_LIBRARIES}
     pthread
 )
