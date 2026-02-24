@@ -62,13 +62,13 @@ void Config::load_from_file(const char* config_file) {
 }
 
 void Config::load_from_env() {
-    const char* env_addr = std::getenv("EXPIRE_LA_SERVER_ADDR");
+    const char* env_addr = std::getenv("T_PBS_SERVER_ADDR");
     if (env_addr) {
         server_addr = env_addr;
         LOG(INFO) << "Server address set from environment: " << server_addr;
     }
     
-    const char* env_port = std::getenv("EXPIRE_LA_SERVER_PORT");
+    const char* env_port = std::getenv("T_PBS_SERVER_PORT");
     if (env_port) {
         server_port = std::atoi(env_port);
         LOG(INFO) << "Server port set from environment: " << server_port;

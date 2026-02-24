@@ -52,6 +52,8 @@ noGWAS*
 # Sensitive files — DO NOT commit keys or secrets
 *.pem
 k8s/pccs-tls-secret.yaml
+k8s/pccs-tls.crt
+k8s/pccs-tls.key
 
 # Build-generated config (contains local paths)
 **/config.status

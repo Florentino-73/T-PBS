@@ -757,11 +757,8 @@ void ecall_worker_thread(hashtable *ht_, MACbuffer *MACbuf_)
             break;
             case 1:
             {   // Job type 1: client request data
-                // printf("###get job type 1..\n");
-                // batch_proposal -- > single proposal;
                 proposal_data *proposal = (proposal_data *)cipher;
                 uint32_t data_id = proposal->data_id;
-                // printf("###proposal data_id is: %u..\n", data_id);
 
                 /* KeyGen  */
                 sgx_key_128bit_t kdk;

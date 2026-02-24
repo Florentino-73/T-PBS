@@ -170,10 +170,6 @@ ATTESTATION_STATUS ecall_batch_add_aek(secure_message_t *resp_data, uint32_t res
 
     for(int i=0; i<data_num; i++)
     {
-        // printf("---------------------------------> receiving data_id: %d,", return_ids[i] );
-        // show_ut(keys+i*16, 16, "receiving derivation keys: ");
-        // printf("#############################\n###########################\n");
-
         sgx_key_128bit_t *rcv_key = (sgx_key_128bit_t*)malloc(MAC_KEY_SIZE);
         if (!rcv_key) return MALLOC_ERROR;
         memcpy(rcv_key, keys+i*MAC_KEY_SIZE, MAC_KEY_SIZE);

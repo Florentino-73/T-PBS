@@ -357,8 +357,7 @@ LOG(WARNING)<<"Client Budget request data num is: "<<data_num << " , take time: 
 	{
 		LOG(INFO)<<"budget request receive ack";
 
-		uint32_t tmp_size = msg_resp->header.size; // tmp size 141
-		// printf("===============tmp size: %d \n", tmp_size);
+		uint32_t tmp_size = msg_resp->header.size;
 		char* tmp_resp = (char *)malloc(tmp_size);
 		if (!tmp_resp) return MALLOC_ERROR;
 

@@ -109,9 +109,6 @@ ATTESTATION_STATUS close_session(dh_session_t *session_info)
     sgx_status_t status;
     uint32_t retstatus;
 
-
-    // printf("INSIDE ENCLAVE INITIATOR, CLOSE SESSION.####\n###\n###\n");  // Cannot use printf in SGX enclave
-
     if(!session_info)
     {
         return INVALID_PARAMETER_ERROR;

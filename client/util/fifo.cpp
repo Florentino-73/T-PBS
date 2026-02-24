@@ -54,7 +54,7 @@ int client_send_receive(FIFO_MSG *fiforequest, size_t fiforequest_size, FIFO_MSG
     ssize_t bytes_received;
     size_t total_received;
 
-    LOG(INFO)<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>CLIENT SEND.";
+    LOG(INFO) << "Client sending request to server.";
 
     server_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock_fd == -1)
@@ -143,7 +143,7 @@ CLEAN:
 
 int client_get_file(FIFO_MSG *file_header, size_t header_size, const char *filename, FIFO_MSG **fiforesponse, size_t *fiforesponse_size)
 {
-    LOG(INFO)<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Client get file";
+    LOG(INFO) << "Client requesting file from server.";
     int ret = 0;
     long byte_num;
     char recv_msg[BUFFER_SIZE + 1] = {0};

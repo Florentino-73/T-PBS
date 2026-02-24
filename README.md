@@ -146,8 +146,8 @@ SERVER_PORT=9999
 
 Can also be overridden via environment variables:
 ```bash
-export EXPIRE_LA_SERVER_ADDR=<SERVER_IP>
-export EXPIRE_LA_SERVER_PORT=8888
+export T_PBS_SERVER_ADDR=<SERVER_IP>
+export T_PBS_SERVER_PORT=8888
 ```
 
 ## Docker & Kubernetes
@@ -164,13 +164,13 @@ K8s manifests are provided in the `k8s/` directory:
 
 ```bash
 # Deploy SGX AESMD daemon
-kubectl apply -f k8s/sgx-aesmd-fixed.yaml
+kubectl apply -f k8s/sgx-aesmd.yaml
 
 # Deploy PCCS config
 kubectl apply -f k8s/pccs-config-configmap.yaml
 
 # Deploy the application
-kubectl apply -f k8s/expire-la-deployment-fixed.yaml
+kubectl apply -f k8s/t-pbs-deployment.yaml
 ```
 
 ## Project Structure

@@ -69,7 +69,7 @@ int message_return(FIFO_MSG *msg, int client_sockfd)
 
 int send_file(int client_sockfd, const char* filename, uint32_t file_size)
 {
-    LOG(INFO)<<">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Server send file to fd: " << client_sockfd;
+    LOG(INFO) << "Server sending file to client fd: " << client_sockfd;
     
     int ret = 0;
     char buffer[BUFFER_SIZE] = {0};
@@ -123,7 +123,7 @@ int send_file(int client_sockfd, const char* filename, uint32_t file_size)
     }
 
     fclose(file);
-    LOG(INFO)<<"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< SEND FILE END.";
+    LOG(INFO) << "File transfer complete.";
     
     return ret;
 }
